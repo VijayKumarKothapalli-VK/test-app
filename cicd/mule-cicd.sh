@@ -12,12 +12,36 @@ source cicd/pipeline.env
 
 STAGE="${1:-}"
 TARGET_ENV="${2:-}"
-MVN=(mvn -B -ntp -s cicd/settings.xml)
+# mule-maven-plugin needs Maven 3.9: newer Maven versions changed the dependency resolver the plugin uses.
+MAVEN_VERSION="3.9.11"
 
 fail() {
   echo "ERROR: $*" >&2
   exit 1
 }
+
+# Use the build agent's Maven if it's 3.9, otherwise download Maven $MAVEN_VERSION from Maven Central (checksum verified).
+maven_command() {
+  local current dir base url
+  current="$(mvn -v 2>/dev/null | sed -n 's/^Apache Maven \([0-9][0-9.]*\).*/\1/p' | head -1 || true)"
+  case "$current" in
+    3.9.*) echo mvn; return ;;
+  esac
+  dir="$HOME/.m2/mule-cicd/apache-maven-$MAVEN_VERSION"
+  if [ ! -x "$dir/bin/mvn" ]; then
+    echo "Build agent has Maven ${current:-(none)}; downloading Maven $MAVEN_VERSION" >&2
+    base="apache-maven-$MAVEN_VERSION-bin.tar.gz"
+    url="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/$base"
+    mkdir -p "$HOME/.m2/mule-cicd"
+    curl -fsSL -o "/tmp/$base" "$url" || fail "Couldn't download Maven from $url"
+    echo "$(curl -fsSL "$url.sha512" | cut -c1-128)  /tmp/$base" | sha512sum -c --quiet - || fail "Maven download failed its checksum."
+    tar -xzf "/tmp/$base" -C "$HOME/.m2/mule-cicd"
+    rm -f "/tmp/$base"
+  fi
+  echo "$dir/bin/mvn"
+}
+
+MVN=("$(maven_command)" -B -ntp -s cicd/settings.xml)
 
 require() {
   local name
