@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e84bdfb8-9e62-4bb1-b041-f594b289c7e6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="test-appFlow" doc:id="07b1cb2c-424a-4f62-8ceb-fab9d9b69afc" >
+		<http:listener doc:name="Listener" doc:id="851ffac5-2e38-4261-9a24-9b78e38da965" config-ref="HTTP_Listener_config" path="/Ae-Test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c130b378-24a7-48f6-b060-b2fb7e512c16" message='#["Request Successful"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="a1708d22-2cd6-475a-92be-9f4d4d838ce7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+"Request Successful"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

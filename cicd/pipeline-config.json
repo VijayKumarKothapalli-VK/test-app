@@ -1,0 +1,34 @@
+{
+  "ciTool": "github",
+  "appName": "test-app",
+  "orgId": "87f7392b-4018-4cb4-a3a0-097ce52060ae",
+  "controlPlane": "us",
+  "muleRuntime": "4.9.8",
+  "javaVersion": "17",
+  "mainBranch": "main",
+  "runMunit": true,
+  "versionStrategy": "build-number",
+  "envPropertyName": "env",
+  "usesSecureProperties": false,
+  "needsEeRepo": false,
+  "defaultTarget": "test-app-target",
+  "environments": [
+    {
+      "key": "sandbox",
+      "anypointEnvironment": "Sandbox",
+      "applicationName": "test-app",
+      "target": "audio-enhancement-privatespace",
+      "replicas": 1,
+      "vCores": "0.1",
+      "approval": false,
+      "muleEnvValue": "sandbox"
+    }
+  ],
+  "updatePom": true,
+  "kitVersion": "1.0.0",
+  "jenkins": {
+    "mavenTool": "maven-3",
+    "jdkTool": "jdk-17"
+  },
+  "secureKeyPropertyName": "secure.key"
+}
